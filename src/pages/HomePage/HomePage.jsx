@@ -11,6 +11,8 @@ import { useGetWeatherData } from "../../hooks/useGetWeatherData";
 import { useState } from "react";
 import { Cards } from "../../components/Cards/Cards";
 import { DarkModes } from "../../components/DarkMode/DarkModes";
+import { useGetWeatherDataEstimation } from "../../hooks/useGetWeatherDataEstimation";
+import { ForecastCards } from "../../components/ForecastCards/ForecastCards";
 
 export const HomePage = () => {
   const {
@@ -18,14 +20,16 @@ export const HomePage = () => {
     fetchData,
     weatherData,
   } = useGetWeatherData();
-
   const [city, setCity] = useState();
+
+  const { fetchDataEstimation, estimationData } = useGetWeatherDataEstimation();
 
   const bg = useColorModeValue("blue.100", "orange.800");
   const textColor = useColorModeValue("blue.600", "black");
 
   const handleClickSearch = async () => {
     await fetchData(city);
+    await fetchDataEstimation(city);
   };
 
   return (
@@ -84,7 +88,25 @@ export const HomePage = () => {
         flexDirection="column"
         alignItems="center"
       >
-        <Cards weatherData={weatherData} />
+        {weatherData && <Cards weatherData={weatherData} />}
+        {estimationData && estimationData.data?.list?.length > 0 && (
+          <>
+            <Heading
+              as="h3"
+              size="2xl"
+              color={textColor}
+              textAlign="center"
+              w="100%"
+              mt="5"
+            >
+              5 günlük hava təxmini
+            </Heading>
+
+            <Box display="flex" flexDirection="row" mt={5}>
+              <ForecastCards estimationData={estimationData} />
+            </Box>
+          </>
+        )}
       </Box>
     </Box>
   );
